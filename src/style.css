@@ -1,0 +1,14 @@
+:root {
+  font-family: 'Cascadia Code', monospace;
+  line-height: 1;
+  font-weight: 600;
+
+  color-scheme: dark;
+  color: #fff;
+  background-color: #000;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
