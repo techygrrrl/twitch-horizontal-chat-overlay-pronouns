@@ -161,18 +161,23 @@ const bitsBadgeForData = (
   if (data.user.badges["bits-leader"] === 1) {
     return "https://static-cdn.jtvnw.net/badges/v1/8bedf8c3-7a6d-4df2-b62f-791b96a5dd31/2";
   }
+  // todo: Verify that bits-leader 2 works
   if (data.user.badges["bits-leader"] === 2) {
     return "https://static.twitchcdn.net/assets/BitsBadge-Silver_36-2194db3d68f51d3dd14c.png";
   }
+  // todo: Verify that bits-leader 3 works
   if (data.user.badges["bits-leader"] === 3) {
     return "https://static.twitchcdn.net/assets/BitsBadge-Bronze_36-a9a8deeb17fa7fd7b7b3.png";
   }
+  // todo: Verify that gift-leader 1 works
   if (data.user.badges["gift-leader"] === 1) {
     return "https://static-cdn.jtvnw.net/badges/v1/21656088-7da2-4467-acd2-55220e1f45ad/2";
   }
+  // todo: Verify that gift-leader 2 works
   if (data.user.badges["gift-leader"] === 2) {
     return "https://static.twitchcdn.net/assets/GiftBadge-Silver_36-bb7c268e0452a2cdcc8d.png";
   }
+  // todo: Verify that gift-leader 3 works
   if (data.user.badges["gift-leader"] === 3) {
     return "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png";
   }
