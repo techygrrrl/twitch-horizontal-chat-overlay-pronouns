@@ -19,7 +19,6 @@
   - [x] Show gift leader badges
 - [x] Show pronouns
 
-
 ## Usage
 
 You need to pass the following query params in the URL:
@@ -28,9 +27,10 @@ You need to pass the following query params in the URL:
 | ---------------- | --------------------------------------- | --------------------------------------------------------------------------------- |
 | `token`          | _generated UUID_                        | **Required**: Get this from the `abstractrrr tokens` command                      |
 | `broadcaster_id` | `123456789`                             | **Required**: Twitch user ID for the streamer user of the Abstractrrr token       |
+| `host`           | `localhost` (default) or `192.168.0.15` | _(optional)_: Host that abstractrrr is running on.                                |
+| `port`           | `9999` (default)                        | _(optional)_: Port that abstractrrr is running on.                                |
 | `time_ms`        | `5000` (default)                        | _(optional)_: Time in milliseconds that each chat message should be displayed for |
 | `debug`          | `1` or `0`                              | _(optional)_: Provides extra logging                                              |
-| `host`           | `localhost` (default) or `192.168.0.15` | _(optional)_: Host that abstractrrr is running on.                                |
 
 Here is an example URL:
 
