@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {kebabify} from "../utils/string-utils.ts";
 import {Pronoun, pronounToColourMap} from "../utils/pronouns.ts";
 
 defineProps<{
