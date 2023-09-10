@@ -15,3 +15,22 @@ export function debugModeFromURL(): boolean {
 
   return value === "true" || value === "1" || value === "yes";
 }
+
+export function messageVisibilityMilliseconds(): number {
+  const defaultMillis = 5000
+
+  const params = new URLSearchParams(location.search);
+
+  const value = params.get("time_ms")
+
+  if (!value) {
+    return defaultMillis
+  }
+
+  const parsedValue = parseInt(value)
+  if (isNaN(parsedValue)) {
+    return defaultMillis
+  }
+
+  return Math.max(parsedValue, defaultMillis)
+}

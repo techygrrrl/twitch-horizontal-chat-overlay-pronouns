@@ -26,6 +26,20 @@ export interface IRCEventPing {
   };
 }
 
+export interface IRCEventClearChat {
+  irc_type: "ClearChatMessage"
+  irc_data: IRCEventClearChatData
+}
+
+export interface IRCEventClearChatData {
+  raw: string;
+  type: number;
+  raw_type: "CLEARCHAT";
+  ban_duration: number;
+  target_user_id: string;
+  target_username: string;
+}
+
 export interface IRCEventPong {
   irc_type: "PongMessage";
   irc_data: {
@@ -43,7 +57,7 @@ export interface IRCEventPrivateMessage {
 
 export type IRCEvent = {
   event_type: "irc"
-  event_data: IRCEventPrivateMessage | IRCEventPong | IRCEventPing;
+  event_data: IRCEventPrivateMessage | IRCEventPong | IRCEventPing | IRCEventClearChat;
 };
 
 export interface IRCData {
@@ -74,8 +88,38 @@ export interface User {
 }
 
 export interface Badges {
-  broadcaster: number;
-  subscriber: number;
+  broadcaster?: number;
+  subscriber?: number;
+  moderator?: number;
+  vip?: number;
 }
 
 // endregion Generated types
+
+
+// region UI types
+
+export type TwitchChatMessage = {
+  username: string
+  color: string
+  subBadgeUrl: string | null
+  broadcaster: boolean
+  moderator: boolean
+  vip: boolean
+  pronouns: string | null
+  message: string // TODO: inject nodes??
+}
+
+// endregion UI types
+
+
+export const ircDataToTwitchChatMessage = (data: IRCData): TwitchChatMessage => ({
+  username: data.user.display_name,
+  color: data.tags.color || "#fff",
+  message: data.message,
+  broadcaster: data.user.badges.broadcaster === 1,
+  moderator: data.user.badges.moderator === 1,
+  vip: data.user.badges.vip === 1,
+  subBadgeUrl: null, // todo:
+  pronouns: null, // todo:
+})

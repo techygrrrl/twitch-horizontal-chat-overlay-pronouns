@@ -1,4 +1,4 @@
-import { AbstractrrrEvent, IRCData } from "./twitch-chat-utils.ts";
+import { AbstractrrrEvent, IRCData, IRCEventClearChatData } from "./twitch-chat-utils.ts";
 import { debugModeFromURL } from "./url-utils.ts";
 
 
@@ -8,9 +8,11 @@ export const connectToChat = ({
   onChat,
   onError,
   onClose,
+  onClearChat,
 }: {
   port: string;
   token: string;
+  onClearChat: (irc_data: IRCEventClearChatData) => void,
   onChat: (irc_data: IRCData) => void;
   onError: (event: Event) => void;
   onClose: (event: CloseEvent) => void;
@@ -51,6 +53,9 @@ export const connectToChat = ({
             onChat(parsedData.event_data.irc_data)
             break;
           case "PingMessage":
+            break;
+          case "ClearChatMessage":
+            onClearChat(parsedData.event_data.irc_data)
             break;
           case "PongMessage":
             break;
