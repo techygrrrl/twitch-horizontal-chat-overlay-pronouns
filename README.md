@@ -6,17 +6,19 @@
 
 ## Features and Roadmap
 
--   [x] Show chat messages
--   [x] Configure the visibility time of each message with `time_ms=` (minimum 5000 ms / 5 seconds)
--   [x] Show badges
-    -   [x] Show VIP badges
-    -   [x] Show moderator badges
-    -   [x] Show broadcaster badges
-    -   [x] Show subscriber badges
-    -   [x] Show bits badges
-    -   [x] Show bit leader badges
-    -   [x] Show gift leader badges
--   [x] Show pronouns
+- [x] Show chat messages
+- [ ] Display Twitch emotes inline
+- [x] Configure the visibility time of each message with `time_ms=` (minimum 5000 ms / 5 seconds)
+- [x] Show badges
+  - [x] Show VIP badges
+  - [x] Show moderator badges
+  - [x] Show broadcaster badges
+  - [x] Show subscriber badges
+  - [x] Show bits badges
+  - [x] Show bit leader badges
+  - [x] Show gift leader badges
+- [x] Show pronouns
+
 
 ## Usage
 
@@ -40,5 +42,5 @@ http://127.0.0.1:5173/?token=MY_ABSTRACTRRR_TOKEN&debug=1&time_ms=10000&host=192
 
 Project built using Vue 3 + TypeScript + Vite
 
-      npm install
-      npm run dev
+    npm install
+    npm run dev
