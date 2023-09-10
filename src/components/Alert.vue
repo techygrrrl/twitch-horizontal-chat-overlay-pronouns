@@ -13,7 +13,12 @@ defineProps<{
 
 <style scoped>
 .alert {
+  display: inline-block;
   color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .alert--success {

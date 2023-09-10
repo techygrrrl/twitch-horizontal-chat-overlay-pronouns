@@ -12,7 +12,10 @@
   - [x] Show VIP badges
   - [x] Show moderator badges
   - [x] Show broadcaster badges
-  - [ ] Show subscriber badges
+  - [x] Show subscriber badges
+  - [ ] Show bits badges
+  - [x] Show bit leader badges
+  - [ ] Show gift leader badges
 - [ ] Show pronouns
 
 

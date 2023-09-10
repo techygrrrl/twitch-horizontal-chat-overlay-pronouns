@@ -8,6 +8,26 @@ export function portFromURL() {
   return params.get("port") || "9999";
 }
 
+
+export function broadcasterIdFromURL(): string | null {
+    const params = new URLSearchParams(location.search);
+    return params.get("broadcaster_id");
+}
+
+
+export function sslFromURL(): boolean {
+  const params = new URLSearchParams(location.search);
+  const value = (params.get("ssl") || "").toLowerCase()
+
+  return value === "true" || value === "1" || value === "yes";
+}
+
+
+export function hostFromURL() {
+  const params = new URLSearchParams(location.search);
+  return params.get("host") || "localhost";
+}
+
 export function debugModeFromURL(): boolean {
   const params = new URLSearchParams(location.search);
 

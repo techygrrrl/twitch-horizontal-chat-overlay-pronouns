@@ -9,6 +9,8 @@ defineProps<{
   color: string
   pronouns: string | null
   subBadge: string | null
+  bitsBadge: string | null
+  giftBadge: string | null
   vip: boolean
   mod: boolean
   broadcaster: boolean
@@ -33,8 +35,10 @@ onMounted(() => {
   <div class="chat-message" :class="[fadeClass]">
     <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" class="badge">
     <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" class="badge">
-    <!-- TODO: sub badge -->
     <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" alt="" class="badge">
+    <img v-if="giftBadge" :src="giftBadge" alt="" class="badge">
+    <img v-if="subBadge" :src="subBadge" alt="" class="badge">
+    <img v-if="bitsBadge" :src="bitsBadge" alt="" class="badge">
     <div class="badge badge--empty"></div>
     <span :style="{ color: color }" class="username">{{ username }}</span>
     <span v-if="pronouns" class="pronouns" :class="[`pronouns__${kebabify(pronouns)}`]">({{ pronouns.toLowerCase() }})</span>
@@ -53,6 +57,7 @@ onMounted(() => {
 
 .badge {
   height: 22px;
+  margin-left: 4px;
 }
 
 .badge--empty {

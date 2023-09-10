@@ -2,16 +2,41 @@
 import { onMounted, ref } from "vue";
 import ChatMessage from "./components/ChatMessage.vue";
 import Alert from "./components/Alert.vue";
-import { debugModeFromURL, messageVisibilityMilliseconds, portFromURL, tokenFromURL } from "./utils/url-utils.ts";
+import {
+  broadcasterIdFromURL,
+  debugModeFromURL,
+  hostFromURL,
+  messageVisibilityMilliseconds,
+  portFromURL, sslFromURL,
+  tokenFromURL
+} from "./utils/url-utils.ts";
 import { connectToChat } from "./utils/networking-utils.ts";
-import { IRCData, ircDataToTwitchChatMessage, TwitchChatMessage } from "./utils/twitch-chat-utils.ts";
+import {
+  ChatBadgeLookup,
+  ChatBadgesResponse,
+  IRCData,
+  ircDataToTwitchChatMessage, transformChatBadgesResponseToLookup,
+  TwitchChatMessage
+} from "./utils/twitch-chat-utils.ts";
+import { AbstractrrrApiClient } from "./utils/AbstractrrrApiClient.ts";
 
 // Configuration
 const token = tokenFromURL()
 const port = portFromURL()
 const debug = debugModeFromURL()
+const host = hostFromURL()
+const useSSL = sslFromURL()
+const broadcasterId = broadcasterIdFromURL()
 const messageVisibility = messageVisibilityMilliseconds()
 
+
+const apiClient = new AbstractrrrApiClient({
+  host,
+  port,
+  token: token,
+  broadcasterId,
+  ssl: useSSL,
+})
 
 // region State management
 
@@ -19,31 +44,23 @@ const messageVisibility = messageVisibilityMilliseconds()
 
 const noTokenError = ref<boolean>(!token)
 const abstractrrrConnectionError = ref<boolean>(false)
+const noBroadcasterIdError = ref<boolean>(!broadcasterId)
 
 // endregion Error states
 
 
 // region Messages
 
-// const visibleMessages = ref<TwitchChatMessage[]>([{
-//   message: "this is a fake message",
-//   vip: true,
-//   username: "SomeUser",
-//   color: "#8B39FF",
-//   moderator: false,
-//   broadcaster: false,
-//   pronouns: null,
-//   subBadgeUrl: null,
-// }])
 const visibleMessages = ref<TwitchChatMessage[]>([])
 const enqueuedMessages = ref<IRCData[]>([])
+const chatBadgeLookup = ref<ChatBadgeLookup>({ bits: {}, subscriber: {} })
 
 const onNewMessage = () => {
   const nextMessage: IRCData = enqueuedMessages.value[0]
 
   if (!nextMessage) return
 
-  const nextMessageForUI = ircDataToTwitchChatMessage(nextMessage)
+  const nextMessageForUI = ircDataToTwitchChatMessage(nextMessage, chatBadgeLookup.value)
 
   enqueuedMessages.value = enqueuedMessages.value.slice(1)
 
@@ -66,10 +83,22 @@ const onNewMessage = () => {
 onMounted(() => {
   if (!port) return
   if (!token) return
+  if (!host) return
 
+  // Load up badges in lookup table
+  apiClient
+    .makeGet<ChatBadgesResponse>(
+      `/v1/api/helix/chat/badges?broadcaster_id=${broadcasterId}`
+    )
+    .then(({ data }) => {
+      chatBadgeLookup.value = transformChatBadgesResponseToLookup(data)
+    })
+
+  // Connect to chat
   connectToChat({
     port,
     token,
+    host,
     onClearChat(data) {
       // Remove all messages from enqueued
       if (data.target_user_id) {
@@ -108,7 +137,8 @@ onMounted(() => {
 <template>
   <!-- region Alerts / Errors -->
 
-  <Alert v-if="noTokenError" message="No abstractrrr token" type="error" />
+  <Alert v-if="noTokenError" message="Query param `token` required" type="error" />
+  <Alert v-if="noBroadcasterIdError" message="Query param `broadcaster_id` required" type="error" />
   <Alert v-if="abstractrrrConnectionError" message="Cannot connect to Abstractrrr" type="error" />
 
   <!-- endregion Alerts / Errors -->
@@ -118,6 +148,7 @@ onMounted(() => {
       <ChatMessage
         :pronouns="null"
         :sub-badge="message.subBadgeUrl"
+        :bits-badge="message.bitsBadgeUrl"
         :broadcaster="message.broadcaster"
         :color="message.color"
         :message="message.message"

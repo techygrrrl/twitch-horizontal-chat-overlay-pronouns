@@ -5,6 +5,7 @@ import { debugModeFromURL } from "./url-utils.ts";
 export const connectToChat = ({
   port,
   token,
+  host,
   onChat,
   onError,
   onClose,
@@ -12,6 +13,7 @@ export const connectToChat = ({
 }: {
   port: string;
   token: string;
+  host: string;
   onClearChat: (irc_data: IRCEventClearChatData) => void,
   onChat: (irc_data: IRCData) => void;
   onError: (event: Event) => void;
@@ -21,12 +23,12 @@ export const connectToChat = ({
 
   if (debug) {
     console.log(
-      `Connecting to web sockets at URL ws://localhost:${port}/v1/subscribe with token: ${token}`
+      `Connecting to web sockets at URL ws://${host}:${port}/v1/subscribe with token: ${token}`
     );
   }
 
   // Create WebSocket connection.
-  const socket = new WebSocket(`ws://localhost:${port}/v1/subscribe`);
+  const socket = new WebSocket(`ws://${host}:${port}/v1/subscribe`);
 
   socket.addEventListener("close", (event) => {
     onClose(event);
