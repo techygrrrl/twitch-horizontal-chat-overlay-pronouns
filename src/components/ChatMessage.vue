@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {kebabify} from "../utils/string-utils.ts";
+import {Pronoun, pronounToColourMap} from "../utils/pronouns.ts";
 
 defineProps<{
   username: string
   message: string
   color: string
-  pronouns: string | null
+  pronouns: Pronoun | null
   subBadge: string | null
   bitsBadge: string | null
   giftBadge: string | null
@@ -42,7 +43,13 @@ onMounted(() => {
     <img v-if="bitsBadge" :src="bitsBadge" alt="" class="badge">
     <div class="badge badge--empty"></div>
     <span :style="{ color: color }" class="username">{{ username }}</span>
-    <span v-if="pronouns" class="pronouns" :class="[`pronouns__${kebabify(pronouns)}`]">({{ pronouns.toLowerCase() }})</span>
+    <span
+        v-if="pronouns"
+        class="pronouns"
+        :style="{ color: pronounToColourMap[pronouns.name] }"
+    >
+      ({{ pronouns.display.toLowerCase() }})
+    </span>
     <!-- todo: inject emote images (subs, twitch globals, smiley/monkeys) -->
     <span class="message">{{ message }}</span>
   </div>
@@ -75,25 +82,10 @@ onMounted(() => {
 .pronouns {
   font-size: 0.85rem;
   margin: 0 0.2em;
-  //font-style: italic;
   //padding: 0em 0.3em;
   //border: 1px solid #fff;
-  border-radius: 3px;
+  // border-radius: 3px;
   //opacity: 0.8;
-}
-.pronouns__she-her {
-  //color: #DB3BBA;
-  color: #E633C7;
-}
-.pronouns__he-him {
-  color: #15AEEF;
-}
-.pronouns__they-them {
-  color: #9B33E6;
-}
-.pronouns__it-its {
-  //color: #54B989;
-  color: #807694;
 }
 
 .message {

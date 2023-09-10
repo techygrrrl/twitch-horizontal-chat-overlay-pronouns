@@ -7,7 +7,8 @@ import {
   debugModeFromURL,
   hostFromURL,
   messageVisibilityMilliseconds,
-  portFromURL, sslFromURL,
+  portFromURL,
+  sslFromURL,
   tokenFromURL
 } from "./utils/url-utils.ts";
 import { connectToChat } from "./utils/networking-utils.ts";
@@ -15,10 +16,16 @@ import {
   ChatBadgeLookup,
   ChatBadgesResponse,
   IRCData,
-  ircDataToTwitchChatMessage, transformChatBadgesResponseToLookup,
+  ircDataToTwitchChatMessage,
+  transformChatBadgesResponseToLookup,
   TwitchChatMessage
 } from "./utils/twitch-chat-utils.ts";
 import { AbstractrrrApiClient } from "./utils/AbstractrrrApiClient.ts";
+import {
+  getPronounsAsKeyToDisplayMap,
+  getUserPronoun,
+  Pronoun
+} from "./utils/pronouns.ts";
 
 // Configuration
 const token = tokenFromURL()
@@ -54,13 +61,34 @@ const noBroadcasterIdError = ref<boolean>(!broadcasterId)
 const visibleMessages = ref<TwitchChatMessage[]>([])
 const enqueuedMessages = ref<IRCData[]>([])
 const chatBadgeLookup = ref<ChatBadgeLookup>({ bits: {}, subscriber: {} })
+const pronounsKeyToDisplayMap = ref<Record<string,string>>({})
 
-const onNewMessage = () => {
+const onNewMessage = async () => {
   const nextMessage: IRCData = enqueuedMessages.value[0]
 
   if (!nextMessage) return
 
-  const nextMessageForUI = ircDataToTwitchChatMessage(nextMessage, chatBadgeLookup.value)
+  let pronouns: Pronoun | null = null
+  try {
+    const userPronoun = await getUserPronoun(nextMessage.user.name)
+
+    if (userPronoun) {
+      pronouns = {
+        name: userPronoun,
+        display: pronounsKeyToDisplayMap.value[userPronoun] || userPronoun
+      }
+    }
+  } catch (e) {
+    if (debug) {
+      console.error("Failed to fetch pronouns", e)
+    }
+  }
+
+  const nextMessageForUI = ircDataToTwitchChatMessage(
+      nextMessage,
+      chatBadgeLookup.value,
+      pronouns
+  )
 
   enqueuedMessages.value = enqueuedMessages.value.slice(1)
 
@@ -92,6 +120,11 @@ onMounted(() => {
     )
     .then(({ data }) => {
       chatBadgeLookup.value = transformChatBadgesResponseToLookup(data)
+    })
+
+  getPronounsAsKeyToDisplayMap()
+    .then(data => {
+      pronounsKeyToDisplayMap.value = data
     })
 
   // Connect to chat
@@ -146,9 +179,10 @@ onMounted(() => {
   <div class="horizontal-layout">
     <div v-for="message in visibleMessages" class="horizontal-layout__item">
       <ChatMessage
-        :pronouns="null"
+        :pronouns="message.pronouns"
         :sub-badge="message.subBadgeUrl"
         :bits-badge="message.bitsBadgeUrl"
+        :gift-badge="message.bitsBadgeUrl"
         :broadcaster="message.broadcaster"
         :color="message.color"
         :message="message.message"
