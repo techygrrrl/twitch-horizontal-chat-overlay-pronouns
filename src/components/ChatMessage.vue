@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { kebabify } from "../utils/string-utils.ts";
-import { messageVisibilityMilliseconds } from "../utils/url-utils.ts";
+import {kebabify} from "../utils/string-utils.ts";
 
 defineProps<{
   username: string

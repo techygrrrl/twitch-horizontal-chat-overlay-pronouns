@@ -8,14 +8,14 @@
 
 - [x] Show chat messages
 - [x] Configure the visibility time of each message with `time_ms=` (minimum 5000 ms / 5 seconds)
-- [ ] Show badges
+- [x] Show badges
   - [x] Show VIP badges
   - [x] Show moderator badges
   - [x] Show broadcaster badges
   - [x] Show subscriber badges
-  - [ ] Show bits badges
+  - [x] Show bits badges
   - [x] Show bit leader badges
-  - [ ] Show gift leader badges
+  - [x] Show gift leader badges
 - [ ] Show pronouns
 
 
