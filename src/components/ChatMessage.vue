@@ -16,6 +16,7 @@ defineProps<{
   broadcaster: boolean
 }>()
 
+/*
 const fadeClass = ref<'fadeIn' | 'fadeOut' | null>('fadeIn')
 
 onMounted(() => {
@@ -27,12 +28,14 @@ onMounted(() => {
     fadeClass.value = 'fadeOut'
   }, messageVisibilityMilliseconds() - 1000)
 })
+*/
 </script>
 
 
 <template>
 
-  <div class="chat-message" :class="[fadeClass]">
+<!--  <div class="chat-message" :class="[fadeClass]">-->
+  <div class="chat-message">
     <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" class="badge">
     <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" class="badge">
     <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" alt="" class="badge">
