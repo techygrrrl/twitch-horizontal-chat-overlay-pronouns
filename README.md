@@ -7,7 +7,7 @@
 ## Features and Roadmap
 
 - [x] Show chat messages
-- [ ] Display Twitch emotes inline
+- [x] Display Twitch emotes inline
 - [x] Configure the visibility time of each message with `time_ms=` (minimum 5000 ms / 5 seconds)
 - [x] Show badges
   - [x] Show VIP badges
