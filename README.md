@@ -32,7 +32,13 @@ You need to pass the following query params in the URL:
 | `time_ms`        | `5000` (default)                        | _(optional)_: Time in milliseconds that each chat message should be displayed for |
 | `debug`          | `1` or `0`                              | _(optional)_: Provides extra logging                                              |
 
-Here is an example URL:
+Here is an example URL with the hosted version if you'd like to use the one I use:
+
+```
+http://chat.techygrrrl.stream/?token=MY_ABSTRACTRRR_TOKEN&debug=1&time_ms=10000&host=192.168.0.15&broadcaster_id=123456789
+```
+
+Or locally:
 
 ```
 http://127.0.0.1:5173/?token=MY_ABSTRACTRRR_TOKEN&debug=1&time_ms=10000&host=192.168.0.15&broadcaster_id=123456789
