@@ -34,13 +34,13 @@ onMounted(() => {
 
 <!--  <div class="chat-message" :class="[fadeClass]">-->
   <div class="chat-message">
+    <div data-badge="empty" class="badge badge--empty"></div>
     <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" data-badge="broadcaster" class="badge">
     <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" data-badge="mod" class="badge">
     <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" data-badge="vip" alt="" class="badge">
     <img v-if="giftBadge" :src="giftBadge" alt="" data-badge="gift" class="badge">
     <img v-if="subBadge" :src="subBadge" alt="" data-badge="sub" class="badge">
     <img v-if="bitsBadge" :src="bitsBadge" alt="" data-badge="bits" class="badge">
-    <div data-badge="empty" class="badge badge--empty"></div>
     <span :style="{ color: color }" class="username">{{ username }}</span>
     <span
         v-if="pronouns"
@@ -50,7 +50,7 @@ onMounted(() => {
       ({{ pronouns.display.toLowerCase() }})
     </span>
     <!-- todo: inject emote images (subs, twitch globals, smiley/monkeys) -->
-    <span class="message">{{ message }}</span>
+    <span class="message" v-html="message"></span>
   </div>
 
 </template>
@@ -58,8 +58,13 @@ onMounted(() => {
 
 <style lang="scss">
 .chat-message {
+  line-height: 1.5;
   display: flex;
   align-items: center;
+
+  // todo: configure
+  text-shadow: 1px 1px 2px rgba(#000, 0.8);
+  //filter: drop-shadow(1px 1px 1px #000);
 }
 
 .badge {
@@ -68,9 +73,9 @@ onMounted(() => {
 }
 
 .badge--empty {
-  width: 2px;
+  width: 1px;
   position: relative;
-  left: -2px;
+  left: -1px;
 }
 
 .username {
