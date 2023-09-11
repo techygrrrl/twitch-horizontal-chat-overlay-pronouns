@@ -82,7 +82,7 @@ export async function getUserPronoun(username: string): Promise<string | undefin
     })
 
     userPronounsCache[username] = {
-        value: match?.pronoun_id
+        value: match ? match.pronoun_id : undefined
     }
 
     if (match !== undefined) {

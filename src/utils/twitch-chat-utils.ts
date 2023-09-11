@@ -235,10 +235,7 @@ export const ircDataToTwitchChatMessage = (
   vip: data.user.badges.vip === 1,
   giftBadgeUrl: giftBadgeForData(data),
   bitsBadgeUrl: bitsBadgeForData(data, chatBadgeLookup),
-  subBadgeUrl: data.user.badges.subscriber
-    ? chatBadgeLookup.subscriber[`${data.user.badges.subscriber}`]
-        ?.image_url_2x || null
-    : null,
+  subBadgeUrl: subBadgeForData(data, chatBadgeLookup),
   pronouns,
 });
 
@@ -246,20 +243,23 @@ export const ircDataToTwitchChatMessage = (
 const sensitiveEmotes = ['>(', '<3', 'R)', ';p', ':p', ';)', ':\\', ':|', 'O_o', 'B)', ':O', ':D', ':(', ':)']
 
 const htmlMessageForData = (data: IRCData): string => {
-  let message = data.message
+  let message = data.message;
 
-  data.emotes?.forEach((emote) => {
-    const url = emoteUrlForEmoteId(emote.id)
+  (data.emotes || [])
+    .forEach((emote: IRCEmoteInMessageData) => {
+      const url = emoteUrlForEmoteId(emote.id)
 
-    if (!url) return
+      if (!url) return
 
-    if (sensitiveEmotes.includes(emote.name)) {
-      message = message.replaceAll(emote.name, wrapEmoteHtml(url))
-    } else {
-      const re = new RegExp('\\b' + emote.name + '\\b', 'g')
-      message = message.replace(re, wrapEmoteHtml(url))
-    }
-  })
+      if (sensitiveEmotes.includes(emote.name)) {
+        while (message.includes(emote.name)) {
+          message = message.replace(emote.name, wrapEmoteHtml(url))
+        }
+      } else {
+        const re = new RegExp('\\b' + emote.name + '\\b', 'g')
+        message = message.replace(re, wrapEmoteHtml(url))
+      }
+    })
 
   return message
 }
@@ -273,6 +273,18 @@ const wrapEmoteHtml = (imageUrl: string): string => {
       <img src="${imageUrl}" class="emote" />
     </span>
   `
+}
+
+const subBadgeForData = (
+    data: IRCData,
+    chatBadgeLookup: ChatBadgeLookup
+): string | null => {
+  if (!data.user.badges.subscriber) return null
+
+  const subBadge = chatBadgeLookup.subscriber[`${data.user.badges.subscriber}`]
+  if (!subBadge) return null
+
+  return subBadge.image_url_2x || null
 }
 
 const giftBadgeForData = (data: IRCData): string | null => {
