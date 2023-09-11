@@ -59,6 +59,7 @@ const noBroadcasterIdError = ref<boolean>(!broadcasterId)
 // region Messages
 
 const visibleMessages = ref<TwitchChatMessage[]>([])
+// const visibleMessages = ref<TwitchChatMessage[]>(sampleVisibleMessagesData)
 const enqueuedMessages = ref<IRCData[]>([])
 const chatBadgeLookup = ref<ChatBadgeLookup>({ bits: {}, subscriber: {} })
 const pronounsKeyToDisplayMap = ref<Record<string,string>>({})
@@ -182,7 +183,7 @@ onMounted(() => {
         :pronouns="message.pronouns"
         :sub-badge="message.subBadgeUrl"
         :bits-badge="message.bitsBadgeUrl"
-        :gift-badge="message.bitsBadgeUrl"
+        :gift-badge="message.giftBadgeUrl"
         :broadcaster="message.broadcaster"
         :color="message.color"
         :message="message.message"
@@ -196,10 +197,12 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .horizontal-layout {
-  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .horizontal-layout__item {
   margin-right: 1.5rem;
+  display: inline-block;
 }
 </style>

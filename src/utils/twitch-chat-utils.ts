@@ -129,12 +129,61 @@ export type TwitchChatMessage = {
   color: string;
   subBadgeUrl: string | null;
   bitsBadgeUrl: string | null;
+  giftBadgeUrl: string | null;
   broadcaster: boolean;
   moderator: boolean;
   vip: boolean;
   pronouns: Pronoun | null;
   message: string; // TODO: inject nodes??
 };
+
+export const sampleVisibleMessagesData: TwitchChatMessage[] = [
+  {
+    username: 'techygrrrl',
+    color: '#F100BC',
+    broadcaster: true,
+    moderator: false,
+    vip: false,
+    pronouns: {
+      display: 'She/Her',
+      name: 'sheher'
+    },
+    message: 'The quick brown fox jumped over the lazy dog',
+    subBadgeUrl: null,
+    giftBadgeUrl: "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png",
+    bitsBadgeUrl: null,
+  },
+  {
+    username: 'techydrrroid',
+    color: '#31C296',
+    broadcaster: false,
+    moderator: true,
+    vip: false,
+    pronouns: {
+      display: 'It/its',
+      name: 'itits'
+    },
+    message: 'The quick brown fox jumped over the lazy dog',
+    subBadgeUrl: null,
+    giftBadgeUrl: null,
+    bitsBadgeUrl: "https://static.twitchcdn.net/assets/BitsBadge-Silver_36-2194db3d68f51d3dd14c.png",
+  },
+  {
+    username: 'justinfan1337',
+    color: '#7638DF',
+    broadcaster: false,
+    moderator: false,
+    vip: false,
+    pronouns: {
+      display: 'He/Him',
+      name: 'hehim'
+    },
+    message: 'The quick brown fox jumped over the lazy dog',
+    subBadgeUrl: null,
+    giftBadgeUrl: null,
+    bitsBadgeUrl: null,
+  },
+]
 
 // endregion UI types
 
@@ -149,6 +198,7 @@ export const ircDataToTwitchChatMessage = (
   broadcaster: data.user.badges.broadcaster === 1,
   moderator: data.user.badges.moderator === 1,
   vip: data.user.badges.vip === 1,
+  giftBadgeUrl: giftBadgeForData(data),
   bitsBadgeUrl: bitsBadgeForData(data, chatBadgeLookup),
   subBadgeUrl: data.user.badges.subscriber
     ? chatBadgeLookup.subscriber[`${data.user.badges.subscriber}`]
@@ -156,6 +206,22 @@ export const ircDataToTwitchChatMessage = (
     : null,
   pronouns,
 });
+
+const giftBadgeForData = (data: IRCData): string | null => {
+  // todo: Verify that gift-leader 1 works
+  if (data.user.badges["gift-leader"] === 1) {
+    return "https://static-cdn.jtvnw.net/badges/v1/21656088-7da2-4467-acd2-55220e1f45ad/2";
+  }
+  // todo: Verify that gift-leader 2 works
+  if (data.user.badges["gift-leader"] === 2) {
+    return "https://static.twitchcdn.net/assets/GiftBadge-Silver_36-bb7c268e0452a2cdcc8d.png";
+  }
+  // todo: Verify that gift-leader 3 works
+  if (data.user.badges["gift-leader"] === 3) {
+    return "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png";
+  }
+  return null
+}
 
 const bitsBadgeForData = (
   data: IRCData,
@@ -171,18 +237,6 @@ const bitsBadgeForData = (
   // todo: Verify that bits-leader 3 works
   if (data.user.badges["bits-leader"] === 3) {
     return "https://static.twitchcdn.net/assets/BitsBadge-Bronze_36-a9a8deeb17fa7fd7b7b3.png";
-  }
-  // todo: Verify that gift-leader 1 works
-  if (data.user.badges["gift-leader"] === 1) {
-    return "https://static-cdn.jtvnw.net/badges/v1/21656088-7da2-4467-acd2-55220e1f45ad/2";
-  }
-  // todo: Verify that gift-leader 2 works
-  if (data.user.badges["gift-leader"] === 2) {
-    return "https://static.twitchcdn.net/assets/GiftBadge-Silver_36-bb7c268e0452a2cdcc8d.png";
-  }
-  // todo: Verify that gift-leader 3 works
-  if (data.user.badges["gift-leader"] === 3) {
-    return "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png";
   }
   if (data.user.badges.bits) {
     return chatBadgeLookup.bits[`${data.user.badges.bits}`]?.image_url_2x;

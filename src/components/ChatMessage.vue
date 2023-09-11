@@ -34,13 +34,13 @@ onMounted(() => {
 
 <!--  <div class="chat-message" :class="[fadeClass]">-->
   <div class="chat-message">
-    <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" class="badge">
-    <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" class="badge">
-    <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" alt="" class="badge">
-    <img v-if="giftBadge" :src="giftBadge" alt="" class="badge">
-    <img v-if="subBadge" :src="subBadge" alt="" class="badge">
-    <img v-if="bitsBadge" :src="bitsBadge" alt="" class="badge">
-    <div class="badge badge--empty"></div>
+    <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" data-badge="broadcaster" class="badge">
+    <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" data-badge="mod" class="badge">
+    <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" data-badge="vip" alt="" class="badge">
+    <img v-if="giftBadge" :src="giftBadge" alt="" data-badge="gift" class="badge">
+    <img v-if="subBadge" :src="subBadge" alt="" data-badge="sub" class="badge">
+    <img v-if="bitsBadge" :src="bitsBadge" alt="" data-badge="bits" class="badge">
+    <div data-badge="empty" class="badge badge--empty"></div>
     <span :style="{ color: color }" class="username">{{ username }}</span>
     <span
         v-if="pronouns"
@@ -63,7 +63,7 @@ onMounted(() => {
 }
 
 .badge {
-  height: 22px;
+  height: 16px;
   margin-left: 4px;
 }
 
@@ -81,14 +81,11 @@ onMounted(() => {
 .pronouns {
   font-size: 0.85rem;
   margin: 0 0.2em;
-  //padding: 0em 0.3em;
-  //border: 1px solid #fff;
-  // border-radius: 3px;
-  //opacity: 0.8;
 }
 
 .message {
   margin: 0 0.2em;
+  word-break: keep-all;
 }
 
 
