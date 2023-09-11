@@ -88,7 +88,7 @@ const onNewMessage = async () => {
   const nextMessageForUI = ircDataToTwitchChatMessage(
       nextMessage,
       chatBadgeLookup.value,
-      pronouns
+      pronouns,
   )
 
   enqueuedMessages.value = enqueuedMessages.value.slice(1)

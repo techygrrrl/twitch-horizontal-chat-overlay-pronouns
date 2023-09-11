@@ -77,12 +77,22 @@ export interface IRCData {
   room_id: string;
   id: string;
   time: string;
-  emotes: null;
+  emotes: IRCEmoteInMessageData[] | null;
   bits: number;
   action: boolean;
   first_message: boolean;
   reply: null;
   custom_reward_id: string;
+}
+
+export type IRCEmoteInMessageData = {
+  name: string
+  id: string
+  count: number
+  positions: {
+    start: number
+    end: number
+  }[]
 }
 
 export interface User {
@@ -120,6 +130,16 @@ export interface ChatBadgeVersionData {
   title: string;
 }
 
+export interface ChatEmote {
+  id: string;
+  name: string;
+  images: {
+    url_1x: string;
+    url_2x: string;
+    url_4x: string;
+  }
+}
+
 // endregion Generated types
 
 // region UI types
@@ -134,10 +154,25 @@ export type TwitchChatMessage = {
   moderator: boolean;
   vip: boolean;
   pronouns: Pronoun | null;
-  message: string; // TODO: inject nodes??
+  message: string;
 };
 
 export const sampleVisibleMessagesData: TwitchChatMessage[] = [
+  {
+    username: 'techygrrrl',
+    color: '#F100BC',
+    broadcaster: true,
+    moderator: false,
+    vip: false,
+    pronouns: {
+      display: 'She/Her',
+      name: 'sheher'
+    },
+    message: 'testing some emotes <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/2.0" class="emote" /></span> test <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/1/default/dark/2.0" class="emote" /></span> <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/36/default/dark/2.0" class="emote" /></span> yep <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_11461ca766174124b4d6fba913d046fa/default/dark/2.0" class="emote" /></span> <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_8d597504027f46958675df7bdbab107c/default/dark/2.0" class="emote" /></span>',
+    subBadgeUrl: null,
+    giftBadgeUrl: "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png",
+    bitsBadgeUrl: null,
+  },
   {
     username: 'techygrrrl',
     color: '#F100BC',
@@ -194,7 +229,7 @@ export const ircDataToTwitchChatMessage = (
 ): TwitchChatMessage => ({
   username: data.user.display_name,
   color: data.tags.color || "#fff",
-  message: data.message,
+  message: htmlMessageForData(data),
   broadcaster: data.user.badges.broadcaster === 1,
   moderator: data.user.badges.moderator === 1,
   vip: data.user.badges.vip === 1,
@@ -206,6 +241,39 @@ export const ircDataToTwitchChatMessage = (
     : null,
   pronouns,
 });
+
+
+const sensitiveEmotes = ['>(', '<3', 'R)', ';p', ':p', ';)', ':\\', ':|', 'O_o', 'B)', ':O', ':D', ':(', ':)']
+
+const htmlMessageForData = (data: IRCData): string => {
+  let message = data.message
+
+  data.emotes?.forEach((emote) => {
+    const url = emoteUrlForEmoteId(emote.id)
+
+    if (!url) return
+
+    if (sensitiveEmotes.includes(emote.name)) {
+      message = message.replaceAll(emote.name, wrapEmoteHtml(url))
+    } else {
+      const re = new RegExp('\\b' + emote.name + '\\b', 'g')
+      message = message.replace(re, wrapEmoteHtml(url))
+    }
+  })
+
+  return message
+}
+
+const emoteUrlForEmoteId = (id: string): string | null =>
+  `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/light/2.0`
+
+const wrapEmoteHtml = (imageUrl: string): string => {
+  return `
+    <span class="emote-wrapper">
+      <img src="${imageUrl}" class="emote" />
+    </span>
+  `
+}
 
 const giftBadgeForData = (data: IRCData): string | null => {
   // todo: Verify that gift-leader 1 works

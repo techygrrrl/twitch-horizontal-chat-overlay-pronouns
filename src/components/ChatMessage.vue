@@ -93,6 +93,19 @@ onMounted(() => {
   word-break: keep-all;
 }
 
+.emote-wrapper {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  vertical-align: middle;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.emote {
+  max-height: 100%;
+  max-width: 100%;
+}
 
 @-webkit-keyframes fadeIn {
   from {
