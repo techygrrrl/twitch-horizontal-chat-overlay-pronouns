@@ -8,10 +8,11 @@ import {
   hostFromURL,
   messageVisibilityMilliseconds,
   portFromURL,
+  shouldHideErrorConfigFromURL,
   sslFromURL,
   tokenFromURL
 } from "./utils/url-utils.ts";
-import { connectToChat } from "./utils/networking-utils.ts";
+import { AbstractrrrHealthResponse, connectToChat } from "./utils/networking-utils.ts";
 import {
   ChatBadgeLookup,
   ChatBadgesResponse,
@@ -109,18 +110,31 @@ const onNewMessage = async () => {
 
 // endregion State management
 
-onMounted(() => {
+onMounted(async () => {
   if (!port) return
   if (!token) return
   if (!host) return
 
   // Load up badges in lookup table
+  try {
+    const { data } = await apiClient.makeGet<AbstractrrrHealthResponse>('/health')
+    if (data.data.service !== "abstractrrr") {
+      throw new Error(`unknown service ${data.data.service}`)
+    }
+  } catch (e) {
+    console.error(e)
+
+    if (!shouldHideErrorConfigFromURL()) {
+      abstractrrrConnectionError.value = true
+    }
+  }
   apiClient
     .makeGet<ChatBadgesResponse>(
       `/v1/api/helix/chat/badges?broadcaster_id=${broadcasterId}`
     )
     .then(({ data }) => {
       chatBadgeLookup.value = transformChatBadgesResponseToLookup(data)
+      abstractrrrConnectionError.value = false
     })
 
   getPronounsAsKeyToDisplayMap()
@@ -160,9 +174,11 @@ onMounted(() => {
     },
     onError(e) {
       console.error('onError', e)
+      abstractrrrConnectionError.value = true;
     },
     onClose(e) {
       console.error('onClose', e)
+      abstractrrrConnectionError.value = true;
     },
   })
 })
@@ -173,7 +189,7 @@ onMounted(() => {
 
   <Alert v-if="noTokenError" message="Query param `token` required" type="error" />
   <Alert v-if="noBroadcasterIdError" message="Query param `broadcaster_id` required" type="error" />
-  <Alert v-if="abstractrrrConnectionError" message="Cannot connect to Abstractrrr" type="error" />
+  <Alert v-if="abstractrrrConnectionError" message="chat error: tell streamer chat is broken" type="error" />
 
   <!-- endregion Alerts / Errors -->
 

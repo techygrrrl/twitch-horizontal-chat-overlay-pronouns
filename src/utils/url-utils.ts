@@ -36,6 +36,13 @@ export function debugModeFromURL(): boolean {
   return value === "true" || value === "1" || value === "yes";
 }
 
+export function shouldHideErrorConfigFromURL(): boolean {
+  const params = new URLSearchParams(location.search);
+  const value = (params.get("hide_error") || "").toLowerCase()
+
+  return value === "true" || value === "1" || value === "yes";
+}
+
 export function messageVisibilityMilliseconds(): number {
   const defaultMillis = 5000
 

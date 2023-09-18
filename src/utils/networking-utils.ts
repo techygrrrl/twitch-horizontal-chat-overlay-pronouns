@@ -82,3 +82,14 @@ export const connectToChat = ({
     socket.send(JSON.stringify({ token }));
   });
 };
+
+
+export type AbstractrrrHealthResponse = {
+  data: {
+    date: string;
+    service: string;
+  }
+  meta: {
+    request_id: string;
+  }
+}
