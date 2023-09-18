@@ -136,6 +136,12 @@ const initChatConnection = async ({
     // if a retry is already in progress, clear it and make a new one
     if (typeof retryTimeoutId.value === 'number') {
       clearTimeout(retryTimeoutId.value)
+
+      if (retryCount.value > MAX_RETRIES) {
+        console.error(`retries exhausted at ${retryCount.value} attempts`)
+        clearTimeout(retryTimeoutId.value)
+        return
+      }
     }
 
     // increment the retry count
