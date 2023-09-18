@@ -10,6 +10,7 @@ export const connectToChat = ({
   onError,
   onClose,
   onClearChat,
+  onConnect,
 }: {
   port: string;
   token: string;
@@ -18,6 +19,7 @@ export const connectToChat = ({
   onChat: (irc_data: IRCData) => void;
   onError: (event: Event) => void;
   onClose: (event: CloseEvent) => void;
+  onConnect: (event: Event) => void;
 }) => {
   const debug = debugModeFromURL()
 
@@ -73,13 +75,14 @@ export const connectToChat = ({
     }
   });
 
-  socket.addEventListener("open", (_event) => {
+  socket.addEventListener("open", (event) => {
     // Send the auth token
     if (debug) {
       console.log("Sending token payload:", { token });
     }
 
     socket.send(JSON.stringify({ token }));
+    onConnect(event)
   });
 };
 

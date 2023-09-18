@@ -36,7 +36,9 @@ const host = hostFromURL()
 const useSSL = sslFromURL()
 const broadcasterId = broadcasterIdFromURL()
 const messageVisibility = messageVisibilityMilliseconds()
-
+const hideError = shouldHideErrorConfigFromURL()
+const MAX_RETRIES = 20
+const RETRY_INTERVAL_MS = 500
 
 const apiClient = new AbstractrrrApiClient({
   host,
@@ -50,9 +52,14 @@ const apiClient = new AbstractrrrApiClient({
 
 // region Error states
 
+// this error will always show
 const noTokenError = ref<boolean>(!token)
-const abstractrrrConnectionError = ref<boolean>(false)
+
+// this error will always show
 const noBroadcasterIdError = ref<boolean>(!broadcasterId)
+
+// this error will show unless hide_error=1|true
+const abstractrrrConnectionError = ref<boolean>(false)
 
 // endregion Error states
 
@@ -63,7 +70,9 @@ const visibleMessages = ref<TwitchChatMessage[]>([])
 // const visibleMessages = ref<TwitchChatMessage[]>(sampleVisibleMessagesData)
 const enqueuedMessages = ref<IRCData[]>([])
 const chatBadgeLookup = ref<ChatBadgeLookup>({ bits: {}, subscriber: {} })
-const pronounsKeyToDisplayMap = ref<Record<string,string>>({})
+const pronounsKeyToDisplayMap = ref<Record<string, string>>({})
+const retryCount = ref<number>(0)
+const retryTimeoutId = ref<number | null>(null)
 
 const onNewMessage = async () => {
   const nextMessage: IRCData = enqueuedMessages.value[0]
@@ -87,9 +96,9 @@ const onNewMessage = async () => {
   }
 
   const nextMessageForUI = ircDataToTwitchChatMessage(
-      nextMessage,
-      chatBadgeLookup.value,
-      pronouns,
+    nextMessage,
+    chatBadgeLookup.value,
+    pronouns,
   )
 
   enqueuedMessages.value = enqueuedMessages.value.slice(1)
@@ -110,10 +119,36 @@ const onNewMessage = async () => {
 
 // endregion State management
 
-onMounted(async () => {
-  if (!port) return
-  if (!token) return
-  if (!host) return
+const initChatConnection = async ({
+  token,
+  port,
+  host,
+}: {
+  token: string,
+  port: string,
+  host: string
+}) => {
+
+  /**
+   * tracks the retry count and retries if within the retry configuration
+   */
+  const retryConnection = () => {
+    // if a retry is already in progress, clear it and make a new one
+    if (typeof retryTimeoutId.value === 'number') {
+      clearTimeout(retryTimeoutId.value)
+    }
+
+    // increment the retry count
+    retryCount.value++
+    if (debug) {
+      console.log(`retry attempt: ${retryCount.value}`)
+    }
+
+    // start retry interval
+    retryTimeoutId.value = setTimeout(() => {
+      initChatConnection({ token, port, host })
+    }, RETRY_INTERVAL_MS)
+  }
 
   // Load up badges in lookup table
   try {
@@ -124,10 +159,14 @@ onMounted(async () => {
   } catch (e) {
     console.error(e)
 
-    if (!shouldHideErrorConfigFromURL()) {
+    if (!hideError) {
       abstractrrrConnectionError.value = true
     }
+
+    retryConnection()
+    return
   }
+
   apiClient
     .makeGet<ChatBadgesResponse>(
       `/v1/api/helix/chat/badges?broadcaster_id=${broadcasterId}`
@@ -137,24 +176,22 @@ onMounted(async () => {
       abstractrrrConnectionError.value = false
     })
 
-  getPronounsAsKeyToDisplayMap()
-    .then(data => {
-      pronounsKeyToDisplayMap.value = data
-    })
-
   // Connect to chat
   connectToChat({
     port,
     token,
     host,
+    onConnect() {
+      retryCount.value = 0
+    },
     onClearChat(data) {
       // Remove all messages from enqueued
       if (data.target_user_id) {
         enqueuedMessages.value = enqueuedMessages.value
-            .filter(message => message.user.id !== data.target_user_id)
+          .filter(message => message.user.id !== data.target_user_id)
 
         // Remove all messages from the UI
-      visibleMessages.value = visibleMessages.value
+        visibleMessages.value = visibleMessages.value
           .filter(message => message.username.toLowerCase() !== data.target_username.toLowerCase())
       } else {
         enqueuedMessages.value = []
@@ -179,8 +216,23 @@ onMounted(async () => {
     onClose(e) {
       console.error('onClose', e)
       abstractrrrConnectionError.value = true;
+
+      retryConnection()
     },
   })
+}
+
+onMounted(async () => {
+  if (!port) return
+  if (!token) return
+  if (!host) return
+
+  initChatConnection({ token, port, host })
+
+  getPronounsAsKeyToDisplayMap()
+    .then(data => {
+      pronounsKeyToDisplayMap.value = data
+    })
 })
 </script>
 
@@ -189,7 +241,11 @@ onMounted(async () => {
 
   <Alert v-if="noTokenError" message="Query param `token` required" type="error" />
   <Alert v-if="noBroadcasterIdError" message="Query param `broadcaster_id` required" type="error" />
-  <Alert v-if="abstractrrrConnectionError" message="chat error: tell streamer chat is broken" type="error" />
+  <Alert
+    v-if="abstractrrrConnectionError && !hideError"
+    message="chat error: tell streamer chat is broken"
+    type="error"
+  />
 
   <!-- endregion Alerts / Errors -->
 
