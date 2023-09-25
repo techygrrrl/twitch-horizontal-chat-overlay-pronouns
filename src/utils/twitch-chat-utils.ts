@@ -176,7 +176,7 @@ export const sampleVisibleMessagesData: TwitchChatMessage[] = [
   },
   {
     username: 'founder1337',
-    color: '#7638DF',
+    color: '#807694',
     broadcaster: false,
     moderator: false,
     vip: false,
@@ -241,7 +241,7 @@ export const ircDataToTwitchChatMessage = (
   pronouns: Pronoun | null,
 ): TwitchChatMessage => ({
   username: data.user.display_name,
-  color: data.tags.color || "#fff",
+  color: data.tags.color || "#807694",
   message: htmlMessageForData(data),
   broadcaster: data.user.badges.broadcaster === 1,
   moderator: data.user.badges.moderator === 1,
