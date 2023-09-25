@@ -107,6 +107,7 @@ export interface Badges {
   broadcaster?: number;
   "bits-leader"?: number;
   "gift-leader"?: number;
+  "founder"?: number;
   bits?: number;
   subscriber?: number;
   moderator?: number;
@@ -171,6 +172,18 @@ export const sampleVisibleMessagesData: TwitchChatMessage[] = [
     message: 'testing some emotes <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/2.0" class="emote" /></span> test <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/1/default/dark/2.0" class="emote" /></span> <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/36/default/dark/2.0" class="emote" /></span> yep <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_11461ca766174124b4d6fba913d046fa/default/dark/2.0" class="emote" /></span> <span class="emote-wrapper"><img src="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_8d597504027f46958675df7bdbab107c/default/dark/2.0" class="emote" /></span>',
     subBadgeUrl: null,
     giftBadgeUrl: "https://static.twitchcdn.net/assets/GiftBadge-Bronze_36-fd0ee2ef5196b3414a2f.png",
+    bitsBadgeUrl: null,
+  },
+  {
+    username: 'founder1337',
+    color: '#7638DF',
+    broadcaster: false,
+    moderator: false,
+    vip: false,
+    pronouns: null,
+    message: 'The quick brown fox jumped over the lazy dog',
+    subBadgeUrl: 'https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/2',
+    giftBadgeUrl: null,
     bitsBadgeUrl: null,
   },
   {
@@ -279,6 +292,10 @@ const subBadgeForData = (
     data: IRCData,
     chatBadgeLookup: ChatBadgeLookup
 ): string | null => {
+  if (typeof data.user.badges["founder"] === 'number' || data.user.badges["founder"] === 0) {
+    return "https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/2"
+  }
+
   if (!data.user.badges.subscriber) return null
 
   const subBadge = chatBadgeLookup.subscriber[`${data.user.badges.subscriber}`]
