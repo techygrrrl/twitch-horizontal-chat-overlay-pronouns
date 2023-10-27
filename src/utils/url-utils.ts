@@ -43,6 +43,22 @@ export function shouldHideErrorConfigFromURL(): boolean {
   return value === "true" || value === "1" || value === "yes";
 }
 
+/**
+ * does not validate that this is a valid hex code
+ */
+export function hexBackgroundColourFromURL(): string | undefined {
+  const params = new URLSearchParams(location.search);
+  return params.get("bg") ? "#" + params.get("bg") : undefined;
+}
+
+/**
+ * does not validate that this is a valid hex code
+ */
+export function hexForegroundColourFromURL(): string | undefined {
+  const params = new URLSearchParams(location.search);
+  return params.get("fg") ? "#" + params.get("fg") : undefined;
+}
+
 export function messageVisibilityMilliseconds(): number {
   const defaultMillis = 5000
 

@@ -13,3 +13,8 @@
   /* for development */
   /*color-scheme: dark;*/
 }
+
+body {
+  /* `background-color` is set and removed dynamically. do not set here */
+  margin: 8px; /* default */
+}

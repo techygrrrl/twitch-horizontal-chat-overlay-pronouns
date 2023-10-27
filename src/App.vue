@@ -5,6 +5,8 @@ import Alert from "./components/Alert.vue";
 import {
   broadcasterIdFromURL,
   debugModeFromURL,
+  hexBackgroundColourFromURL,
+  hexForegroundColourFromURL,
   hostFromURL,
   messageVisibilityMilliseconds,
   portFromURL,
@@ -34,6 +36,8 @@ const port = portFromURL()
 const debug = debugModeFromURL()
 const host = hostFromURL()
 const useSSL = sslFromURL()
+const bgColour = hexBackgroundColourFromURL()
+const fgColour = hexForegroundColourFromURL()
 const broadcasterId = broadcasterIdFromURL()
 const messageVisibility = messageVisibilityMilliseconds()
 const hideError = shouldHideErrorConfigFromURL()
@@ -235,6 +239,12 @@ onMounted(async () => {
 
   initChatConnection({ token, port, host })
 
+  if (bgColour) {
+    document.body.style.setProperty("background-color", bgColour)
+  } else {
+    document.body.style.removeProperty("background-color")
+  }
+
   getPronounsAsKeyToDisplayMap()
     .then(data => {
       pronounsKeyToDisplayMap.value = data
@@ -255,7 +265,7 @@ onMounted(async () => {
 
   <!-- endregion Alerts / Errors -->
 
-  <div class="horizontal-layout">
+  <div class="horizontal-layout" :style="{ color: fgColour }">
     <div v-for="message in visibleMessages" class="horizontal-layout__item">
       <ChatMessage
         :pronouns="message.pronouns"
