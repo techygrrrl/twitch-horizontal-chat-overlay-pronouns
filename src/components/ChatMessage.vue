@@ -49,7 +49,6 @@ onMounted(() => {
     >
       ({{ pronouns.display.toLowerCase() }})
     </span>
-    <!-- todo: inject emote images (subs, twitch globals, smiley/monkeys) -->
     <span class="message" v-html="message"></span>
   </div>
 
@@ -65,6 +64,11 @@ onMounted(() => {
   // todo: configure
   text-shadow: 1px 1px 2px rgba(#000, 0.8);
   //filter: drop-shadow(1px 1px 1px #000);
+
+  // with background
+  background: rgba(#000, 0.8);
+  padding: 2px 2px;
+  border-radius: 4px;
 }
 
 .badge {

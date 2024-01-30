@@ -290,7 +290,7 @@ onMounted(async () => {
 }
 
 .horizontal-layout__item {
-  margin-right: 1.5rem;
+  margin-right: 0.5rem;
   display: inline-block;
 }
 </style>
