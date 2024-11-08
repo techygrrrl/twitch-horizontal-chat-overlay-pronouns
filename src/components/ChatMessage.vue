@@ -2,6 +2,7 @@
 import {Pronoun, pronounToColourMap} from "../utils/pronouns.ts";
 
 defineProps<{
+  avatarUrl: string | null
   username: string
   message: string
   color: string
@@ -34,7 +35,9 @@ onMounted(() => {
 
 <!--  <div class="chat-message" :class="[fadeClass]">-->
   <div class="chat-message">
-    <div data-badge="empty" class="badge badge--empty"></div>
+    <!-- Retain the right height even when something's missing -->
+    <div data-avatar="empty" class="empty"></div>
+    <img v-if="avatarUrl" class="avatar" :src="avatarUrl" />
     <img v-if="broadcaster" src="../assets/badges/ic_twitch_broadcaster.png" alt="" data-badge="broadcaster" class="badge">
     <img v-if="mod" src="../assets/badges/ic_twitch_moderator.png" alt="" data-badge="mod" class="badge">
     <img v-if="vip" src="../assets/badges/ic_twitch_vip.png" data-badge="vip" alt="" class="badge">
@@ -67,7 +70,7 @@ onMounted(() => {
 
   // with background
   background: rgba(#000, 0.8);
-  padding: 2px 2px;
+  padding: 4px 2px;
   border-radius: 4px;
 }
 
@@ -76,7 +79,14 @@ onMounted(() => {
   margin-left: 4px;
 }
 
-.badge--empty {
+.avatar {
+  height: 26px;
+  margin-left: 4px;
+  border-radius: 100%;
+}
+
+.empty {
+  height: 30px;
   width: 1px;
   position: relative;
   left: -1px;

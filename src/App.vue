@@ -12,22 +12,28 @@ import {
   portFromURL,
   shouldHideErrorConfigFromURL,
   sslFromURL,
-  tokenFromURL
+  tokenFromURL,
 } from "./utils/url-utils.ts";
-import { AbstractrrrHealthResponse, connectToChat } from "./utils/networking-utils.ts";
+import {
+  AbstractrrrHealthResponse,
+  connectToChat,
+  tryAsyncOrDefault,
+} from "./utils/networking-utils.ts";
 import {
   ChatBadgeLookup,
   ChatBadgesResponse,
+  getTwitchUserAvatar,
   IRCData,
   ircDataToTwitchChatMessage,
   transformChatBadgesResponseToLookup,
-  TwitchChatMessage
+  TwitchChatMessage,
+  UserResponse,
 } from "./utils/twitch-chat-utils.ts";
 import { AbstractrrrApiClient } from "./utils/AbstractrrrApiClient.ts";
 import {
   getPronounsAsKeyToDisplayMap,
   getUserPronoun,
-  Pronoun
+  Pronoun,
 } from "./utils/pronouns.ts";
 
 // Configuration
@@ -99,11 +105,15 @@ const onNewMessage = async () => {
     }
   }
 
-  const nextMessageForUI = ircDataToTwitchChatMessage(
-    nextMessage,
-    chatBadgeLookup.value,
+  // Get profile image
+  const avatarUrl = await getTwitchUserAvatar(nextMessage.user.id, apiClient)
+
+  const nextMessageForUI = ircDataToTwitchChatMessage({
+    data: nextMessage,
+    chatBadgeLookup: chatBadgeLookup.value,
     pronouns,
-  )
+    avatarUrl,
+  });
 
   enqueuedMessages.value = enqueuedMessages.value.slice(1)
 
@@ -278,6 +288,7 @@ onMounted(async () => {
         :mod="message.moderator"
         :vip="message.vip"
         :username="message.username"
+        :avatar-url="message.avatarUrl"
       />
     </div>
   </div>
