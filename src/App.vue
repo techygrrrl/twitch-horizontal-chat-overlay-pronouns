@@ -17,7 +17,6 @@ import {
 import {
   AbstractrrrHealthResponse,
   connectToChat,
-  tryAsyncOrDefault,
 } from "./utils/networking-utils.ts";
 import {
   ChatBadgeLookup,
@@ -27,7 +26,6 @@ import {
   ircDataToTwitchChatMessage,
   transformChatBadgesResponseToLookup,
   TwitchChatMessage,
-  UserResponse,
 } from "./utils/twitch-chat-utils.ts";
 import { AbstractrrrApiClient } from "./utils/AbstractrrrApiClient.ts";
 import {
